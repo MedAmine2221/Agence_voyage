@@ -1,0 +1,79 @@
+    TextEditingController textController = TextEditingController(text: widget.passeport); // Initialisez le contrôleur avec la valeur actuelle
+    Future<void> _updateEmployee() async {
+      final url = 'http://192.168.1.13/:7229/api/Utilisateurs/${widget.id}';
+
+      final response = await http.put(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "Id": widget.id, // Remplacez par l'ID de l'utilisateur que vous souhaitez mettre à jour
+          "Nom": widget.nom,
+          "Prenom": widget.prenom,
+          "Age": widget.age, // Remplacez par la nouvelle valeur
+          "Genre": widget.genre,
+          "Image": widget.image,
+          "Cin": widget.cin,
+          "Num_passeport":passeport ,
+          "Email": widget.email,
+          "Password": widget.password, // Si le mot de passe change
+          "Num_tel": widget.tel
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("modification reussite");
+      } else {
+        // Gérer l'erreur de mise à jour
+        print('Erreur lors de la mise à jour de l\'employé.');
+      }
+    }
+    void _showAlert(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Passeport Number"),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextFieldContainer(
+                    child: TextField(
+                      controller: textController,
+                      decoration: InputDecoration(
+                        icon: Icon(
+                          Icons.assignment_ind,
+                          color: kPrimaryColor,
+                        ),
+                        hintText: "Passeport Number",
+                        border: InputBorder.none,
+                      ),
+                      onChanged: (value) {
+                        if (mounted) { // Vérifie si le widget est toujours monté
+                          setState(() {
+                            passeport = value;
+                          });
+                        }
+                      },
+                    ),),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () async {
+                  _updateEmployee();
+                },
+                child: Text('Modifier'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Ferme la boîte de dialogue
+                },
+                child: Text('Annuler'),
+              ),
+            ],
+          );
+        },
+      );
+    }
